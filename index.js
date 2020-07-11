@@ -55,6 +55,8 @@ function createMainWindow() {
     }
   });
 
+  win.openDevTools();;
+
   mainWindowState.manage(win);
 
   win.loadURL('https://web.whatsapp.com', {
