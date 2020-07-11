@@ -4,12 +4,15 @@ const os = require('os');
 const configStore = require('./config');
 
 const appName = app.getName();
+const files = require('./files');
 
 function restoreWindow() {
   const win = BrowserWindow.getAllWindows()[0];
   win.show();
   return win;
 }
+
+let webContents = null;
 
 function sendAction(action) {
   const win = BrowserWindow.getAllWindows()[0];
@@ -36,7 +39,7 @@ const trayTpl = [
     type: 'separator'
   },
   {
-    label: `Quit ${appName}`,
+    label: `Quit`,
     click() {
       app.exit(0);
     }
@@ -230,8 +233,63 @@ const linuxTpl = [
     ]
   },
   {
+    label: 'Theme',
+    submenu: [
+      {
+        label: 'Default',
+        type: 'radio',
+        checked: configStore.get('theme', '') == 'default',
+        click(item)
+        {
+          configStore.set('theme', 'default');
+          // module.exports.webContents.send('set-default-theme', 'ping');
+          module.exports.webContents.send('reload');
+        }
+      },
+      {
+        label: 'Clean',
+        type: 'radio',
+        checked: configStore.get('theme', '') == 'clean',
+        click(item) {
+          configStore.set('theme', 'clean');
+
+          module.exports.webContents.send('reload');
+            // files.getThemeCss('clean', css =>
+            // {
+            // // module.exports.webContents.send('set-theme', css);
+            // });
+
+        }
+      },
+    ]
+  },
+  {
     label: 'Settings',
     submenu: [
+      {
+        label: 'Minimize to tray',
+        type: 'checkbox',
+        checked: configStore.get('minimizeToTray', true),
+        click(item) {
+          configStore.set('minimizeToTray', item.checked);
+        }
+      },
+      {
+        label: 'Close to tray',
+        type: 'checkbox',
+        checked: configStore.get('closeToTray', true),
+        click(item) {
+          configStore.set('closeToTray', item.checked);
+        }
+      },
+      {
+        label: 'Ballon Notifications',
+        type: 'checkbox',
+        checked: configStore.get('ballonNotifications', true),
+        click(item) {
+          configStore.set('ballonNotifications', item.checked);
+        }
+      },
       {
         label: 'Enable dark mode',
         type: 'checkbox',
@@ -271,13 +329,46 @@ const winTpl = [
       }
     ]
   },
+
+  {
+    label: 'Theme',
+    submenu: [
+      {
+        label: 'Default',
+        type: 'radio',
+        checked: configStore.get('theme', '') == 'default',
+        click(item)
+        {
+          configStore.set('theme', 'default');
+          // module.exports.webContents.send('set-default-theme', 'ping');
+          module.exports.webContents.send('reload');
+        }
+      },
+      {
+        label: 'Clean',
+        type: 'radio',
+        checked: configStore.get('theme', '') == 'clean',
+        click(item) {
+          configStore.set('theme', 'clean');
+
+          module.exports.webContents.send('reload');
+            // files.getThemeCss('clean', css =>
+            // {
+            // // module.exports.webContents.send('set-theme', css);
+            // });
+
+        }
+      },
+    ]
+  },
+
   {
     label: 'Settings',
     submenu: [
       {
         label: 'Minimize to tray',
         type: 'checkbox',
-        checked: configStore.get('minimizeToTray'),
+        checked: configStore.get('minimizeToTray', true),
         click(item) {
           configStore.set('minimizeToTray', item.checked);
         }
@@ -285,9 +376,18 @@ const winTpl = [
       {
         label: 'Close to tray',
         type: 'checkbox',
-        checked: configStore.get('closeToTray'),
+        checked: configStore.get('closeToTray', true),
         click(item) {
           configStore.set('closeToTray', item.checked);
+        }
+      },
+      {
+        label: 'Ballon Notifications',
+        type: 'checkbox',
+        checked: configStore.get('ballonNotifications', true),
+        click(item) {
+          configStore.set('ballonNotifications', item.checked);
+          module.exports.webContents.send('reload');
         }
       },
       {
@@ -344,5 +444,6 @@ tpl[tpl.length - 1].submenu = helpSubmenu;
 
 module.exports = {
   mainMenu: Menu.buildFromTemplate(tpl),
-  trayMenu: Menu.buildFromTemplate(trayTpl)
+  trayMenu: Menu.buildFromTemplate(trayTpl),
+  webContents: webContents
 };

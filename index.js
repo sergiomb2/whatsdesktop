@@ -4,6 +4,8 @@ const fs = require('fs');
 const {app, BrowserWindow, shell, Tray, Menu} = require('electron');
 const appMenu = require('./menu');
 const configStore = require('./config');
+const files = require('./files');
+const ipc =  require('electron').ipcMain;
 
 let mainWindow;
 let appIcon;
@@ -21,9 +23,9 @@ function updateBadge(title) {
   }
 
   if (messageCount) {
-    appIcon.setImage(path.join(__dirname, 'media', 'logo-tray-blue.png'));
+    appIcon.setImage(path.join(__dirname, 'media', 'tray-notification.png'));
   } else {
-    appIcon.setImage(path.join(__dirname, 'media', 'logo-tray.png'));
+    appIcon.setImage(path.join(__dirname, 'media', 'tray.png'));
   }
 }
 
@@ -81,9 +83,29 @@ function createTray() {
   appIcon = new Tray(path.join(__dirname, 'media', 'logo-tray.png'));
   appIcon.setPressedImage(path.join(__dirname, 'media', 'logo-tray-white.png'));
   appIcon.setContextMenu(appMenu.trayMenu);
+   // appIcon.setToolTip('This is my application.');
 
   appIcon.on('double-click', () => {
-    mainWindow.show();
+
+    if (mainWindow.isVisible())
+    {
+      mainWindow.hide();
+    }
+    else
+    {
+      mainWindow.show();
+    }
+  });
+
+  appIcon.on('click', () => {
+    if (mainWindow.isVisible())
+    {
+      mainWindow.hide();
+    }
+    else
+    {
+      mainWindow.show();
+    }
   });
 }
 
@@ -95,19 +117,41 @@ app.on('ready', () => {
 
   const page = mainWindow.webContents;
 
+  appMenu.webContents = page;
+
   page.on('dom-ready', () => {
     page.insertCSS(fs.readFileSync(path.join(__dirname, 'theme.css'), 'utf8'));
     mainWindow.show();
   });
 
-  page.on('new-window', (error, url) => {
-    error.preventDefault();
+  page.on('new-window', (e, url) => {
+    e.preventDefault();
     shell.openExternal(url);
   });
 
   page.on('did-finish-load', () => {
     mainWindow.setTitle(app.getName());
   });
+
+  ipc.on('did-finish-load-from-renderer', function(event, arg)
+  {
+    if (configStore.get('theme') == 'clean')
+    {
+       files.getThemeCss('clean', css =>
+       {
+          mainWindow.webContents.send('set-theme', css);
+      });
+    }
+    else
+    {
+    }
+  });
+
+  ipc.on('ctrl+w__pressed', function(event, arg)
+  {
+    mainWindow.hide();
+  });
+  
 });
 
 app.on('window-all-closed', () => {
