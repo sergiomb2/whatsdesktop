@@ -1,3 +1,11 @@
+dist: bionic
 language: node_js
+install: yarn install ; yarn build
+addons:
+  apt:
+    packages:
+      - rpm
+cache:
+  yarn: true
 node_js:
-  - '4'
+  - '14.18.1'

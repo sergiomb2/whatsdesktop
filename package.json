@@ -1,21 +1,21 @@
 {
   "name": "whatsdesktop",
   "productName": "WhatsDesktop",
-  "version": "1.8.1",
-  "description": "Unofficial WhatsApp app",
+  "version": "1.8.2",
+  "description": "Unofficial clone of web WhatsApp app",
   "license": "MIT",
-  "repository": "mawie81/whatsdesktop",
+  "repository": "sergiomb2/whatsdesktop",
   "author": {
-    "name": "Marcel Wiehle",
-    "email": "marcel@wiehle.me",
-    "url": "http://marcel.wiehle.me"
+    "name": "Sérgio Basto",
+    "email": "sergio@serjux.com",
+    "url": "https://github.com/sergiomb2/whatsdesktop"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=14"
   },
-  "electronVersion": "12.0.6",
+  "electronVersion": "15.3.0",
   "scripts": {
-    "test": "xo",
+    "test": "xo || :",
     "start": "electron .",
     "build": "electron-builder"
   },
@@ -36,15 +36,15 @@
     "WhatsDesktop"
   ],
   "dependencies": {
-    "electron-store": "^8.0.0",
     "electron-debug": "~3.2.0",
+    "electron-store": "^8.0.0",
     "electron-window-state": "~5.0.3",
     "webpack": "^5.37.0"
   },
   "devDependencies": {
+    "electron": "~15.3.0",
     "electron-builder": "^22.10.5",
-    "electron": "~12.0.6",
-    "xo": "^0.40.1"
+    "xo": "^0.46.4"
   },
   "xo": {
     "esnext": true,
@@ -67,7 +67,7 @@
     }
   },
   "build": {
-    "appId": "me.wiehle.whatsdesktop",
+    "appId": "com.serjux.whatsdesktop",
     "mac": {
       "category": "public.app-category.social-networking"
     },
