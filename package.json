@@ -1,7 +1,7 @@
 {
   "name": "whatsdesktop",
   "productName": "WhatsDesktop",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "Unofficial clone of web WhatsApp app",
   "license": "MIT",
   "repository": "sergiomb2/whatsdesktop",
