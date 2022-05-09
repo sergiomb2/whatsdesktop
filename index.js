@@ -57,7 +57,7 @@ function createMainWindow() {
   mainWindowState.manage(win);
 
   win.loadURL('https://web.whatsapp.com', {
-    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36'
+    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.143 Safari/537.36'
   });
   win.on('closed', () => app.quit);
   win.on('page-title-updated', (error, title) => updateBadge(title));

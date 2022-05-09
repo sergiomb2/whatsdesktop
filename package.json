@@ -13,7 +13,7 @@
   "engines": {
     "node": ">=14"
   },
-  "electronVersion": "18.1.0",
+  "electronVersion": "18.2.0",
   "scripts": {
     "test": "xo || :",
     "start": "electron .",
@@ -42,7 +42,7 @@
     "webpack": "^5.72.0"
   },
   "devDependencies": {
-    "electron": "~18.1.0",
+    "electron": "~18.2.0",
     "electron-builder": "^23.0.3",
     "xo": "^0.48.0"
   },
