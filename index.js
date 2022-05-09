@@ -89,6 +89,20 @@ function createTray() {
 }
 
 
+// 请求获取实例锁，若成功则返回 true，否则表示已存在打开的应用实例
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // 当运行第二个实例时退出它，并聚焦到 mainWindow 窗口
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  })
+
 app.on('ready', () => {
   Menu.setApplicationMenu(appMenu.mainMenu);
 
@@ -151,6 +165,7 @@ mainWindow.webContents.on('context-menu', (event, params) => {
   menu.popup()
 });
 });
+}
 
 app.on('window-all-closed', () => {
   console.log("process.platform" + process.platform);
