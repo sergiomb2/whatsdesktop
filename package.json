@@ -13,7 +13,6 @@
   "engines": {
     "node": ">=14"
   },
-  "electronVersion": "15.5.5",
   "scripts": {
     "test": "xo || :",
     "start": "electron .",
@@ -67,11 +66,15 @@
     }
   },
   "build": {
+    "asar": true,
     "appId": "com.serjux.whatsdesktop",
     "mac": {
       "category": "public.app-category.social-networking"
     },
     "linux": {
+      "mimeTypes": [
+        "x-scheme-handler/whatsapp"
+      ],
       "target": [
         "deb",
         "rpm",

@@ -1,9 +1,10 @@
 'use strict';
 const path = require('path');
 const fs = require('fs');
-const {app, BrowserWindow, shell, Tray, Menu, MenuItem} = require('electron');
+const {app, BrowserWindow, shell, Tray, Menu, MenuItem, ipcMain} = require('electron');
 const appMenu = require('./menu');
 const configStore = require('./config');
+const files = require('./files');
 
 let mainWindow;
 let appIcon;
@@ -46,17 +47,20 @@ function createMainWindow() {
     height: mainWindowState.height,
     minWidth: 400,
     minHeight: 200,
+    // autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'browser.js'),
-      nodeIntegration: false,
-      webSecurity: false,
+      nodeIntegration: true,
+      webSecurity: true,
+      contextIsolation: true,
+      enableRemoteModule: true,
       plugins: true
     }
   });
 
   mainWindowState.manage(win);
 
-  win.loadURL('https://web.whatsapp.com', {
+  win.loadURL('https://web.whatsapp.com/', {
     userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36'
   });
   win.on('closed', () => app.quit);
@@ -68,10 +72,12 @@ function createMainWindow() {
     } else if (process.platform === 'win32' && configStore.get('closeToTray')) {
       win.hide();
       error.preventDefault();
+    } else if (configStore.get('closeToTray')) {
+      win.hide();
     }
   });
   win.on('minimize', () => {
-    if (process.platform === 'win32' && configStore.get('minimizeToTray')) {
+    if (configStore.get('minimizeToTray')) {
       win.hide();
     }
   });
@@ -82,9 +88,23 @@ function createTray() {
   appIcon = new Tray(path.join(__dirname, 'media', 'logo-tray.png'));
   appIcon.setPressedImage(path.join(__dirname, 'media', 'logo-tray-white.png'));
   appIcon.setContextMenu(appMenu.trayMenu);
+   // appIcon.setToolTip('This is my application.');
 
   appIcon.on('double-click', () => {
-    mainWindow.show();
+
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+    }
+  });
+
+  appIcon.on('click', () => {
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+    }
   });
 }
 
@@ -132,6 +152,25 @@ app.on('ready', () => {
 
   page.on('did-finish-load', () => {
     mainWindow.setTitle(app.getName());
+  });
+
+  ipcMain.on('did-finish-load-from-renderer', function(event, arg)
+  {
+    if (configStore.get('theme') == 'clean')
+    {
+       files.getThemeCss('clean', css =>
+       {
+          mainWindow.webContents.send('set-theme', css);
+      });
+    }
+    else
+    {
+    }
+  });
+
+  ipcMain.on('ctrl+w__pressed', function(event, arg)
+  {
+    mainWindow.hide();
   });
 
 mainWindow.webContents.on('context-menu', (event, params) => {

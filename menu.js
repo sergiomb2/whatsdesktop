@@ -4,12 +4,14 @@ const os = require('os');
 const configStore = require('./config');
 
 const appName = app.getName();
+const files = require('./files');
 
 function restoreWindow() {
   const win = BrowserWindow.getAllWindows()[0];
   win.show();
   return win;
 }
+
 
 function sendAction(action) {
   const win = BrowserWindow.getAllWindows()[0];
@@ -20,7 +22,7 @@ const trayTpl = [
   {
     label: 'Show',
     click() {
-      restoreWindow();
+        restoreWindow();
     }
   },
   {
@@ -36,7 +38,7 @@ const trayTpl = [
     type: 'separator'
   },
   {
-    label: `Quit ${appName}`,
+    label: `Quit`,
     click() {
       app.exit(0);
     }
@@ -69,11 +71,16 @@ const viewTpl = {
         configStore.set('zoomLevel', configStore.get('zoomLevel') - 1);
         sendAction('updateZoomLevel');
       }
+    },
+    {
+      label: 'Debug mode',
+      click() { const win = BrowserWindow.getAllWindows()[0];  win.openDevTools();
+      }
     }
   ]
 };
 
-const darwinTpl = [
+const winTpl = [
   {
     label: appName,
     submenu: [
@@ -156,9 +163,60 @@ const darwinTpl = [
       }
     ]
   },
+
+  {
+    label: 'Theme',
+    submenu: [
+      {
+        label: 'Default',
+        type: 'radio',
+        checked: configStore.get('theme', '') == 'default',
+        click(item)
+        {
+          configStore.set('theme', 'default');
+          sendAction('toggleDarkMode');
+          // module.exports.webContents.send('set-default-theme', 'ping');
+          // module.exports.webContents.send('reload');
+        }
+      },
+      {
+        label: 'Clean',
+        type: 'radio',
+        checked: configStore.get('theme', '') == 'clean',
+        click(item) {
+          configStore.set('theme', 'clean');
+
+          // module.exports.webContents.send('reload');
+            files.getThemeCss('clean', css =>
+            {
+            module.exports.webContents.send('set-theme', css);
+            });
+
+        }
+      },
+    ]
+  },
+
+
   {
     label: 'Settings',
     submenu: [
+      {
+        label: 'Minimize to tray',
+        type: 'checkbox',
+        checked: configStore.get('minimizeToTray', true),
+        click(item) {
+          configStore.set('minimizeToTray', item.checked);
+        }
+      },
+      {
+        label: 'Close to tray',
+        type: 'checkbox',
+        checked: configStore.get('closeToTray'),
+        click(item) {
+          configStore.set('closeToTray', item.checked);
+        }
+      },
       {
         label: 'Enable dark mode',
         type: 'checkbox',
@@ -194,7 +252,7 @@ const darwinTpl = [
       },
       {
         label: 'Toggle Full Screen',
-        accelerator: 'Ctrl+Cmd+F',
+        accelerator: 'CmdOrCtrl+F',
         click() {
           const win = BrowserWindow.getAllWindows()[0];
           win.setFullScreen(!win.isFullScreen());
@@ -202,107 +260,7 @@ const darwinTpl = [
       }
     ]
   },
-  {
-    label: 'Help',
-    role: 'help'
-  }
-];
-
-const linuxTpl = [
-  {
-    label: 'Edit',
-    submenu: [
-      {
-        label: 'Cut',
-        accelerator: 'CmdOrCtrl+X',
-        role: 'cut'
-      },
-      {
-        label: 'Copy',
-        accelerator: 'CmdOrCtrl+C',
-        role: 'copy'
-      },
-      {
-        label: 'Paste',
-        accelerator: 'CmdOrCtrl+V',
-        role: 'paste'
-      }
-    ]
-  },
-  {
-    label: 'Settings',
-    submenu: [
-      {
-        label: 'Enable dark mode',
-        type: 'checkbox',
-        checked: configStore.get('darkMode'),
-        click(item) {
-          configStore.set('darkMode', item.checked);
-          sendAction('toggleDarkMode');
-        }
-      }
-    ]
-  },
-  viewTpl,
-  {
-    label: 'Help',
-    role: 'help'
-  }
-];
-
-const winTpl = [
-  {
-    label: 'Edit',
-    submenu: [
-      {
-        label: 'Cut',
-        accelerator: 'CmdOrCtrl+X',
-        role: 'cut'
-      },
-      {
-        label: 'Copy',
-        accelerator: 'CmdOrCtrl+C',
-        role: 'copy'
-      },
-      {
-        label: 'Paste',
-        accelerator: 'CmdOrCtrl+V',
-        role: 'paste'
-      }
-    ]
-  },
-  {
-    label: 'Settings',
-    submenu: [
-      {
-        label: 'Minimize to tray',
-        type: 'checkbox',
-        checked: configStore.get('minimizeToTray'),
-        click(item) {
-          configStore.set('minimizeToTray', item.checked);
-        }
-      },
-      {
-        label: 'Close to tray',
-        type: 'checkbox',
-        checked: configStore.get('closeToTray'),
-        click(item) {
-          configStore.set('closeToTray', item.checked);
-        }
-      },
-      {
-        label: 'Enable dark mode',
-        type: 'checkbox',
-        checked: configStore.get('darkMode'),
-        click(item) {
-          configStore.set('darkMode', item.checked);
-          sendAction('toggleDarkMode');
-        }
-      }
-    ]
-  },
-  viewTpl,
-  {
+{
     label: 'Help',
     role: 'help'
   }
@@ -332,13 +290,7 @@ ${process.platform} ${process.arch} ${os.release()}`;
 ];
 
 let tpl;
-if (process.platform === 'darwin') {
-  tpl = darwinTpl;
-} else if (process.platform === 'win32') {
-  tpl = winTpl;
-} else {
-  tpl = linuxTpl;
-}
+tpl = winTpl;
 
 tpl[tpl.length - 1].submenu = helpSubmenu;
 
