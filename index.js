@@ -60,16 +60,46 @@ function createMainWindow() {
 
   mainWindowState.manage(win);
 
-  win.loadURL('https://web.whatsapp.com/', {
+  win.loadURL('https://web.whatsapp.com', {
     userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36'
   });
+
+  win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
+    // if (webContents.getURL() === host) {
+      if (permission === 'notifications' && !configStore.get('ballonNotifications', true) ) {
+        callback(false); // denied.
+        return;
+      // }
+    }
+    callback(true);
+  });
+
+  // console.log(win.webContents.session.setPermissionRequestHandler);
+  // session.fromPartition(webview.partition).setPermissionRequestHandler()
+
+  // win.webContents.session.setPermissionRequestHandler(
+  //   function permissionRequestHandler(webContents, permission, callback) {
+
+  //     console.log('a4');
+  //    // Place a breakpoint here while debugging with the --inspect-brk command line switch
+  //    return callback(false);
+  //   }
+  // );  
+
+  // console.log('a2');
+
+//    win.loadURL('file://' + __dirname + '/index.html');
+
+//  const ses = win.webContents.session
+//  console.log(ses.getUserAgent())
+
   win.on('closed', () => app.quit);
   win.on('page-title-updated', (error, title) => updateBadge(title));
   win.on('close', error => {
     if (process.platform === 'darwin' && !win.forceClose) {
       error.preventDefault();
       win.hide();
-    } else if (process.platform === 'win32' && configStore.get('closeToTray')) {
+    } else if (process.platform === 'win32' && configStore.get('closeToTray', true) ) {
       win.hide();
       error.preventDefault();
     } else if (configStore.get('closeToTray')) {
@@ -77,7 +107,7 @@ function createMainWindow() {
     }
   });
   win.on('minimize', () => {
-    if (configStore.get('minimizeToTray')) {
+    if (configStore.get('minimizeToTray', true)) {
       win.hide();
     }
   });
@@ -140,13 +170,15 @@ app.on('ready', () => {
   mainWindow.webContents.session.setSpellCheckerLanguages(['pt-PT']);
   const page = mainWindow.webContents;
 
+  // appMenu.webContents = page;
+
   page.on('dom-ready', () => {
     page.insertCSS(fs.readFileSync(path.join(__dirname, 'theme.css'), 'utf8'));
     mainWindow.show();
   });
 
   page.on('new-window', (error, url) => {
-    error.preventDefault();
+    //error.preventDefault();
     shell.openExternal(url);
   });
 

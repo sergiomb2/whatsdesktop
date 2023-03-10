@@ -212,9 +212,18 @@ const winTpl = [
       {
         label: 'Close to tray',
         type: 'checkbox',
-        checked: configStore.get('closeToTray'),
+        checked: configStore.get('closeToTray', true),
         click(item) {
           configStore.set('closeToTray', item.checked);
+        }
+      },
+      {
+        label: 'Ballon Notifications',
+        type: 'checkbox',
+        checked: configStore.get('ballonNotifications', true),
+        click(item) {
+          configStore.set('ballonNotifications', item.checked);
+          module.exports.webContents.send('reload');
         }
       },
       {
