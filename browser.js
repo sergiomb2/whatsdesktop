@@ -12,6 +12,16 @@ function updateZoomLevel() {
   electron.webFrame.setZoomLevel(configStore.get('zoomLevel'));
 }
 
+function nukeWorkers() {
+  if ('serviceWorker' in navigator) {
+    caches.keys().then(function (cacheNames) {
+      cacheNames.forEach(function (cacheName) {
+        caches.delete(cacheName);
+      });
+    });
+  }
+}
+
 ipc.on('toggleDarkMode', toggleDarkMode);
 
 ipc.on('updateZoomLevel', updateZoomLevel);
@@ -19,4 +29,5 @@ ipc.on('updateZoomLevel', updateZoomLevel);
 document.addEventListener('DOMContentLoaded', () => {
   toggleDarkMode();
   updateZoomLevel();
+  nukeWorkers();
 });
