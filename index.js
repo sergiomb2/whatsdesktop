@@ -10,6 +10,7 @@ let mainWindow;
 let appIcon;
 
 //app.commandLine.appendSwitch('lang', 'pt-PT');
+app.commandLine.appendSwitch('disable-gpu-memory-buffer-video-frames');
 function updateBadge(title) {
   const isOSX = Boolean(app.dock);
 
@@ -177,9 +178,14 @@ app.on('ready', () => {
     mainWindow.show();
   });
 
-  page.on('new-window', (error, url) => {
-    //error.preventDefault();
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    // config.fileProtocol is my custom file protocol
+    if (!url.startsWith("http")) {
+        return { action: 'allow' };
+    }
+    // open url in a browser and prevent default
     shell.openExternal(url);
+    return { action: 'deny' };
   });
 
   page.on('did-finish-load', () => {
