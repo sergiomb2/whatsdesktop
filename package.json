@@ -41,7 +41,7 @@
     "webpack": "^5.72.1"
   },
   "devDependencies": {
-    "electron": "~15.5.5",
+    "electron": "^29.1.5",
     "electron-builder": "^23.0.3",
     "xo": "^0.49.0"
   },
