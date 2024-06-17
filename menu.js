@@ -12,7 +12,6 @@ function restoreWindow() {
   return win;
 }
 
-
 function sendAction(action) {
   const win = BrowserWindow.getAllWindows()[0];
   win.webContents.send(action);
@@ -163,7 +162,6 @@ const winTpl = [
       }
     ]
   },
-
   {
     label: 'Theme',
     submenu: [
@@ -175,8 +173,8 @@ const winTpl = [
         {
           configStore.set('theme', 'default');
           sendAction('toggleDarkMode');
-          // module.exports.webContents.send('set-default-theme', 'ping');
-          // module.exports.webContents.send('reload');
+          module.exports.webContents.send('set-default-theme', 'ping');
+          module.exports.webContents.send('reload');
         }
       },
       {
@@ -185,19 +183,14 @@ const winTpl = [
         checked: configStore.get('theme', '') == 'clean',
         click(item) {
           configStore.set('theme', 'clean');
-
-          // module.exports.webContents.send('reload');
-            files.getThemeCss('clean', css =>
-            {
+          module.exports.webContents.send('reload');
+          files.getThemeCss('clean', css => {
             module.exports.webContents.send('set-theme', css);
-            });
-
+          });
         }
       },
     ]
   },
-
-
   {
     label: 'Settings',
     submenu: [
@@ -269,41 +262,37 @@ const winTpl = [
       }
     ]
   },
-{
+  {
     label: 'Help',
-    role: 'help'
+    role: 'help',
+    submenu: [
+      {
+        label: `${appName} Website...`,
+        click() {
+          shell.openExternal('https://github.com/sergiomb2/whatsdesktop');
+        }
+      },
+      {
+        label: 'Report an Issue...',
+        click() {
+          const body = `
+    **Please succinctly describe your issue and steps to reproduce it.**
+
+    -
+
+    ${app.getName()} ${app.getVersion()}
+    ${process.platform} ${process.arch} ${os.release()}`;
+
+          shell.openExternal(`https://github.com/sergiomb2/whatsdesktop/issues/new?body=${encodeURIComponent(body)}`);
+        }
+      }
+    ]
   }
 ];
 
-const helpSubmenu = [
-  {
-    label: `${appName} Website...`,
-    click() {
-      shell.openExternal('https://github.com/sergiomb2/whatsdesktop');
-    }
-  },
-  {
-    label: 'Report an Issue...',
-    click() {
-      const body = `
-**Please succinctly describe your issue and steps to reproduce it.**
-
--
-
-${app.getName()} ${app.getVersion()}
-${process.platform} ${process.arch} ${os.release()}`;
-
-      shell.openExternal(`https://github.com/sergiomb2/whatsdesktop/issues/new?body=${encodeURIComponent(body)}`);
-    }
-  }
-];
-
-let tpl;
-tpl = winTpl;
-
-tpl[tpl.length - 1].submenu = helpSubmenu;
 
 module.exports = {
-  mainMenu: Menu.buildFromTemplate(tpl),
+  mainMenu: Menu.buildFromTemplate(winTpl),
   trayMenu: Menu.buildFromTemplate(trayTpl)
+//  webContents: webContents
 };

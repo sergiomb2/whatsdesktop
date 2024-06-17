@@ -10,7 +10,7 @@ let mainWindow;
 let appIcon;
 
 //app.commandLine.appendSwitch('lang', 'pt-PT');
-app.commandLine.appendSwitch('disable-gpu-memory-buffer-video-frames');
+//app.commandLine.appendSwitch('disable-gpu-memory-buffer-video-frames');
 function updateBadge(title) {
   const isOSX = Boolean(app.dock);
 
