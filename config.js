@@ -1,8 +1,8 @@
 'use strict';
 
-const Config = require('electron-store');
+const Store = require('electron-store').default;
 
-module.exports = new Config({
+module.exports = new Store({
   defaults: {
     darkMode: false,
     closeToTray: false,
