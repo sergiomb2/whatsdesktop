@@ -62,7 +62,7 @@ function createMainWindow() {
   mainWindowState.manage(win);
 
   win.loadURL('https://web.whatsapp.com', {
-    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36'
+    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
   });
 
   win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
@@ -85,7 +85,7 @@ function createMainWindow() {
   //    // Place a breakpoint here while debugging with the --inspect-brk command line switch
   //    return callback(false);
   //   }
-  // );  
+  // );
 
   // console.log('a2');
 
@@ -251,7 +251,7 @@ app.on('window-all-closed', () => {
     app.quit();
   } else {
   console.log("process.platform out and not quit");
-  } 
+  }
 
 });
 
