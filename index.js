@@ -50,7 +50,7 @@ function createMainWindow() {
     minHeight: 200,
     // autoHideMenuBar: true,
     webPreferences: {
-      preload: path.join(__dirname, 'browser.js'),
+      preload: './browser.js',
       nodeIntegration: true,
       webSecurity: true,
       contextIsolation: true,
